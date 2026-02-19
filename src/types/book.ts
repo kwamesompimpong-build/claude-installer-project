@@ -60,6 +60,22 @@ export interface WritingSession {
   chaptersWorkedOn: string[];
 }
 
+export interface DailyLog {
+  date: string; // YYYY-MM-DD
+  wordsWritten: number;
+  minutesWritten: number;
+}
+
+export interface AppSettings {
+  dailyWordGoal: number;
+  authorName: string;
+}
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  dailyWordGoal: 200,
+  authorName: "",
+};
+
 export const DEFAULT_PUBLISHING_CHECKLIST: PublishingChecklist = {
   manuscriptComplete: false,
   editingComplete: false,

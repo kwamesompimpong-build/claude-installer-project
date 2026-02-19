@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Book Writer Pro — Write & Publish Your Story",
+  title: "My Story — Your Book Writing Companion",
   description:
-    "A warm, guided writing tool to help you write your book and bring it to market.",
+    "A warm, gentle writing companion to help you write your book — one day at a time.",
 };
 
 export default function RootLayout({
@@ -14,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-cream text-warm-900 min-h-screen">{children}</body>
+      <body className="bg-cream text-warm-900 min-h-screen text-lg">
+        {children}
+      </body>
     </html>
   );
 }

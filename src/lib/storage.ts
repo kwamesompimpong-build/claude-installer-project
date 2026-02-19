@@ -1,8 +1,26 @@
-import { Book, Chapter, WritingSession, DEFAULT_PUBLISHING_CHECKLIST } from "@/types/book";
+import {
+  Book,
+  Chapter,
+  WritingSession,
+  DailyLog,
+  AppSettings,
+  DEFAULT_PUBLISHING_CHECKLIST,
+  DEFAULT_SETTINGS,
+} from "@/types/book";
 import { v4 as uuidv4 } from "uuid";
 
 const BOOKS_KEY = "bookwriter_books";
 const SESSIONS_KEY = "bookwriter_sessions";
+const DAILY_KEY = "bookwriter_daily";
+const SETTINGS_KEY = "bookwriter_settings";
+
+// ─── Helpers ───
+
+function todayStr(): string {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+// ─── Books ───
 
 export function getBooks(): Book[] {
   if (typeof window === "undefined") return [];
@@ -47,10 +65,20 @@ export function createBook(title: string, authorName: string): Book {
     updatedAt: now,
   };
   saveBook(book);
+  // Also save the author name in settings so we can greet her
+  const settings = getSettings();
+  if (!settings.authorName) {
+    saveSettings({ ...settings, authorName });
+  }
   return book;
 }
 
-export function addChapter(bookId: string, title: string): Chapter | undefined {
+// ─── Chapters ───
+
+export function addChapter(
+  bookId: string,
+  title: string
+): Chapter | undefined {
   const book = getBook(bookId);
   if (!book) return undefined;
   const now = new Date().toISOString();
@@ -91,7 +119,10 @@ export function deleteChapter(bookId: string, chapterId: string): void {
   saveBook(book);
 }
 
-export function reorderChapters(bookId: string, chapterIds: string[]): void {
+export function reorderChapters(
+  bookId: string,
+  chapterIds: string[]
+): void {
   const book = getBook(bookId);
   if (!book) return;
   const reordered: Chapter[] = [];
@@ -105,6 +136,8 @@ export function reorderChapters(bookId: string, chapterIds: string[]): void {
   saveBook(book);
 }
 
+// ─── Word Count ───
+
 export function countWords(text: string): number {
   return text
     .trim()
@@ -116,7 +149,8 @@ export function getTotalWordCount(book: Book): number {
   return book.chapters.reduce((sum, ch) => sum + countWords(ch.content), 0);
 }
 
-// Writing sessions tracking
+// ─── Writing Sessions ───
+
 export function getSessions(): WritingSession[] {
   if (typeof window === "undefined") return [];
   const data = localStorage.getItem(SESSIONS_KEY);
@@ -129,7 +163,78 @@ export function logSession(session: WritingSession): void {
   localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
 }
 
-// Export book as plain text
+// ─── Daily Logs & Streaks ───
+
+export function getDailyLogs(): DailyLog[] {
+  if (typeof window === "undefined") return [];
+  const data = localStorage.getItem(DAILY_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+export function getTodayLog(): DailyLog {
+  const logs = getDailyLogs();
+  const today = todayStr();
+  const existing = logs.find((l) => l.date === today);
+  return existing || { date: today, wordsWritten: 0, minutesWritten: 0 };
+}
+
+export function updateDailyLog(wordsAdded: number, minutesAdded: number): void {
+  if (typeof window === "undefined") return;
+  const logs = getDailyLogs();
+  const today = todayStr();
+  const idx = logs.findIndex((l) => l.date === today);
+  if (idx >= 0) {
+    logs[idx].wordsWritten += wordsAdded;
+    logs[idx].minutesWritten += minutesAdded;
+  } else {
+    logs.push({ date: today, wordsWritten: wordsAdded, minutesWritten: minutesAdded });
+  }
+  localStorage.setItem(DAILY_KEY, JSON.stringify(logs));
+}
+
+export function getStreak(): number {
+  const logs = getDailyLogs()
+    .filter((l) => l.wordsWritten > 0)
+    .map((l) => l.date)
+    .sort()
+    .reverse();
+
+  if (logs.length === 0) return 0;
+
+  const today = todayStr();
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  // Streak must include today or yesterday
+  if (logs[0] !== today && logs[0] !== yesterday) return 0;
+
+  let streak = 1;
+  for (let i = 0; i < logs.length - 1; i++) {
+    const current = new Date(logs[i]);
+    const prev = new Date(logs[i + 1]);
+    const diff = (current.getTime() - prev.getTime()) / 86400000;
+    if (Math.round(diff) === 1) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+// ─── Settings ───
+
+export function getSettings(): AppSettings {
+  if (typeof window === "undefined") return { ...DEFAULT_SETTINGS };
+  const data = localStorage.getItem(SETTINGS_KEY);
+  return data ? { ...DEFAULT_SETTINGS, ...JSON.parse(data) } : { ...DEFAULT_SETTINGS };
+}
+
+export function saveSettings(settings: AppSettings): void {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+// ─── Export ───
+
 export function exportAsText(book: Book): string {
   let text = `${book.title}\n`;
   if (book.subtitle) text += `${book.subtitle}\n`;
@@ -147,7 +252,6 @@ export function exportAsText(book: Book): string {
   return text;
 }
 
-// Export book as HTML (for formatting/printing)
 export function exportAsHtml(book: Book): string {
   const chapters = book.chapters
     .sort((a, b) => a.order - b.order)

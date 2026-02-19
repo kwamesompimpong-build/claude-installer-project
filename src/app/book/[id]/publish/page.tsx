@@ -2,7 +2,13 @@
 
 import { useState, useEffect, use } from "react";
 import { Book, PublishingChecklist } from "@/types/book";
-import { getBook, saveBook, exportAsText, exportAsHtml, getTotalWordCount } from "@/lib/storage";
+import {
+  getBook,
+  saveBook,
+  exportAsText,
+  exportAsHtml,
+  getTotalWordCount,
+} from "@/lib/storage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -58,7 +64,7 @@ const CHECKLIST_ITEMS: {
     key: "copyrightPage",
     label: "Copyright Page",
     description: "Copyright notice, ISBN, and legal information.",
-    guide: "Include: Copyright © [Year] [Your Name]. All rights reserved. ISBN. Publisher name (can be your own). Edition information.",
+    guide: "Include: Copyright \u00A9 [Year] [Your Name]. All rights reserved. ISBN. Publisher name (can be your own). Edition information.",
   },
   {
     key: "formatting",
@@ -77,31 +83,32 @@ const CHECKLIST_ITEMS: {
 const PUBLISHING_PATHS = [
   {
     name: "Amazon KDP",
-    description: "The largest self-publishing platform. Publish ebook and paperback.",
+    description:
+      "The largest self-publishing platform. Publish ebook and paperback.",
     pros: "Massive reach, free to publish, print-on-demand",
-    link: "https://kdp.amazon.com",
   },
   {
     name: "IngramSpark",
     description: "Distribute to bookstores and libraries worldwide.",
     pros: "Wider bookstore distribution, library access, professional credibility",
-    link: "https://www.ingramspark.com",
   },
   {
     name: "Barnes & Noble Press",
     description: "Publish directly to Barnes & Noble's platform.",
     pros: "Direct B&N distribution, ebook and print options",
-    link: "https://press.barnesandnoble.com",
   },
   {
     name: "Draft2Digital",
     description: "Distribute to multiple retailers from one platform.",
     pros: "Wide distribution, easy formatting tools, no exclusivity required",
-    link: "https://www.draft2digital.com",
   },
 ];
 
-export default function PublishPage({ params }: { params: Promise<{ id: string }> }) {
+export default function PublishPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
   const [book, setBook] = useState<Book | null>(null);
@@ -160,38 +167,40 @@ export default function PublishPage({ params }: { params: Promise<{ id: string }
   return (
     <div className="min-h-screen">
       <header className="bg-white/80 border-b border-warm-200">
-        <div className="max-w-5xl mx-auto px-6 py-4">
+        <div className="max-w-4xl mx-auto px-6 py-5">
           <Link
             href={`/book/${book.id}`}
-            className="text-warm-500 hover:text-warm-700 text-sm"
+            className="text-warm-500 hover:text-warm-700"
           >
-            ← Back to {book.title}
+            &larr; Back to {book.title}
           </Link>
-          <h1 className="text-2xl font-serif font-bold text-warm-900 mt-2">
+          <h1 className="text-3xl font-serif font-bold text-warm-900 mt-2">
             Publishing Checklist
           </h1>
-          <p className="text-warm-600 text-sm">
+          <p className="text-warm-600 mt-1">
             Everything you need to get your book to market
           </p>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
+      <main className="max-w-4xl mx-auto px-6 py-8">
         {/* Progress */}
-        <div className="bg-white rounded-xl border border-warm-200 p-6 mb-8">
+        <div className="bg-white rounded-2xl border border-warm-200 p-6 mb-8">
           <div className="flex justify-between items-center mb-3">
-            <h2 className="font-serif font-semibold">Publishing Readiness</h2>
-            <span className="text-sm text-warm-600">
+            <h2 className="font-serif font-semibold text-xl">
+              Publishing Readiness
+            </h2>
+            <span className="text-warm-600">
               {completedCount} / {totalCount} complete
             </span>
           </div>
-          <div className="w-full bg-warm-100 rounded-full h-3">
+          <div className="w-full bg-warm-100 rounded-full h-4">
             <div
-              className="bg-sage-500 h-3 rounded-full transition-all"
+              className="bg-sage-500 h-4 rounded-full transition-all"
               style={{ width: `${publishProgress}%` }}
             />
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-4 text-sm text-warm-600">
+          <div className="mt-3 grid grid-cols-2 gap-4 text-warm-600">
             <p>
               Manuscript: {wordCount.toLocaleString()} words across{" "}
               {book.chapters.length} chapters
@@ -217,24 +226,24 @@ export default function PublishPage({ params }: { params: Promise<{ id: string }
         </div>
 
         {/* Export section */}
-        <div className="bg-white rounded-xl border border-warm-200 p-6 mb-8">
-          <h2 className="font-serif font-semibold text-lg mb-4">
+        <div className="bg-white rounded-2xl border border-warm-200 p-6 mb-8">
+          <h2 className="font-serif font-semibold text-xl mb-4">
             Export Your Manuscript
           </h2>
-          <p className="text-warm-600 text-sm mb-4">
+          <p className="text-warm-600 mb-4">
             Download your book for editing, formatting, or submission to
             publishing platforms.
           </p>
           <div className="flex gap-3 flex-wrap">
             <button
               onClick={handleExportText}
-              className="bg-sage-600 text-white px-5 py-2 rounded-lg hover:bg-sage-700 transition-colors"
+              className="bg-sage-600 text-white px-6 py-3 rounded-xl hover:bg-sage-700 transition-colors"
             >
               Download as Text (.txt)
             </button>
             <button
               onClick={handleExportHtml}
-              className="border border-sage-600 text-sage-700 px-5 py-2 rounded-lg hover:bg-sage-50 transition-colors"
+              className="border border-sage-600 text-sage-700 px-6 py-3 rounded-xl hover:bg-sage-50 transition-colors"
             >
               Download as HTML (printable)
             </button>
@@ -243,10 +252,10 @@ export default function PublishPage({ params }: { params: Promise<{ id: string }
 
         {/* Publishing paths */}
         <div>
-          <h2 className="font-serif font-semibold text-lg mb-4">
+          <h2 className="font-serif font-semibold text-xl mb-4">
             Publishing Platforms
           </h2>
-          <p className="text-warm-600 text-sm mb-4">
+          <p className="text-warm-600 mb-4">
             Here are the main platforms where you can self-publish your book.
             Many authors publish on multiple platforms for maximum reach.
           </p>
@@ -254,15 +263,13 @@ export default function PublishPage({ params }: { params: Promise<{ id: string }
             {PUBLISHING_PATHS.map((platform) => (
               <div
                 key={platform.name}
-                className="bg-white rounded-xl border border-warm-200 p-5"
+                className="bg-white rounded-2xl border border-warm-200 p-6"
               >
-                <h3 className="font-semibold text-warm-900">
+                <h3 className="font-semibold text-warm-900 text-lg">
                   {platform.name}
                 </h3>
-                <p className="text-sm text-warm-600 mt-1">
-                  {platform.description}
-                </p>
-                <p className="text-xs text-sage-600 mt-2">{platform.pros}</p>
+                <p className="text-warm-600 mt-1">{platform.description}</p>
+                <p className="text-sage-600 mt-2">{platform.pros}</p>
               </div>
             ))}
           </div>
@@ -285,21 +292,25 @@ function ChecklistItem({
 
   return (
     <div
-      className={`bg-white rounded-xl border p-4 transition-colors ${
+      className={`bg-white rounded-2xl border p-5 transition-colors ${
         checked ? "border-sage-300 bg-sage-50/50" : "border-warm-200"
       }`}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         <button
           onClick={onToggle}
-          className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+          className={`mt-1 w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
             checked
               ? "bg-sage-600 border-sage-600 text-white"
               : "border-warm-300"
           }`}
         >
           {checked && (
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <svg
+              className="w-4 h-4"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
               <path
                 fillRule="evenodd"
                 d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -311,20 +322,20 @@ function ChecklistItem({
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <h3
-              className={`font-medium ${checked ? "text-sage-700 line-through" : "text-warm-900"}`}
+              className={`font-medium text-lg ${checked ? "text-sage-700 line-through" : "text-warm-900"}`}
             >
               {item.label}
             </h3>
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-xs text-warm-400 hover:text-warm-600"
+              className="text-warm-400 hover:text-warm-600 px-3 py-1 rounded-lg hover:bg-warm-50 transition-colors"
             >
               {expanded ? "Hide guide" : "How to do this"}
             </button>
           </div>
-          <p className="text-sm text-warm-500 mt-0.5">{item.description}</p>
+          <p className="text-warm-500 mt-1">{item.description}</p>
           {expanded && (
-            <div className="mt-3 p-3 bg-parchment rounded-lg text-sm text-warm-700 leading-relaxed">
+            <div className="mt-3 p-4 bg-parchment rounded-xl text-warm-700 leading-relaxed">
               {item.guide}
             </div>
           )}

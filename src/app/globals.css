@@ -25,4 +25,37 @@
 
   --color-cream: #faf7f2;
   --color-parchment: #f5f0e8;
+
+  --color-gold-400: #d4a853;
+  --color-gold-500: #c49a3c;
+}
+
+/* Celebration animation for milestones */
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animate-celebrate {
+  animation: celebrate 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Streak flame glow */
+@keyframes glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
 }
